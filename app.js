@@ -20,7 +20,7 @@ bot.team_join(function(obj) {
         fallback: "Read the Group Nine Slack Guidelines",
         color: "#000000",
         title: "Group Nine Slack Guidelines",
-        title_link: "https://api.slack.com/",
+        title_link: "https://docs.google.com/a/thrillist.com/document/d/1zFI_vSrdYHMLVPSlhIpnbwRWnKTLFmXjIj-n9mbIKHc/edit?usp=sharing",
         text: "Make sure to read our Slack Guidelines"
       },
       {
@@ -28,7 +28,7 @@ bot.team_join(function(obj) {
         color: "#000000",
         pretext: "Setup your profile",
         title: "How To Guide",
-        title_link: "https://cl.ly/2g2i1C3U0e2L",
+        title_link: "https://groupninemedia.slack.com/account/profile",
         fields: [
           {
               title: "Full Name",
@@ -51,8 +51,8 @@ bot.team_join(function(obj) {
         fallback: "Get familiar with Slack",
         color: "#000000",
         pretext: "Get familiar with Slack",
-        title: "Browse Slack Groups",
-        title_link: "https://cl.ly/2g2i1C3U0e2L",
+        title: "Team Directory",
+        title_link: "https://groupninemedia.slack.com/team",
         text: "Get the Who's Who in Group Nine",
         fields: [
           {
