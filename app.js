@@ -9,6 +9,17 @@ const
 var app = express();
 app.set('port', process.env.PORT || 5000);
 
+// route for waking up the heroku app when a member joins
+app.post('/msg-wake-up', function(req, res) {
+  if (req.body.challenge) {
+    res.send(req.body.challenge) // need to resp to challenge on install
+  } else {
+    //wake up!
+    console.log('Im up!')
+    res.send(200)
+  }
+})
+
 bot.team_join(function(obj) {
   console.log("Team join triggered");
   slack.chat.postMessage({
