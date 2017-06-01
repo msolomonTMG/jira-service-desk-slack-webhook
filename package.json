@@ -9,6 +9,7 @@
   "author": "Mike Solomon",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "slack": "^8.3.1"
   }

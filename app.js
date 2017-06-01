@@ -2,12 +2,18 @@
 
 const
   express = require('express'),
+  bodyParser = require('body-parser'),
   slack = require('slack'),
   bot = slack.rtm.client(),
   token = process.env.SLACKBOT_TOKEN;
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
 
 // route for waking up the heroku app when a member joins
 app.post('/msg-wake-up', function(req, res) {
