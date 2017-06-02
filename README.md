@@ -1,1 +1,1 @@
-Welcome users to the Group Nine slack with a message full of useful links
+Send urgent issues to our JIRA Service Desk Slack Channel

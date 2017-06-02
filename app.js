@@ -3,9 +3,7 @@
 const
   express = require('express'),
   bodyParser = require('body-parser'),
-  slack = require('slack'),
-  bot = slack.rtm.client(),
-  token = process.env.SLACKBOT_TOKEN;
+  request = require('request');
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -16,78 +14,58 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 // route for waking up the heroku app when a member joins
-app.post('/msg-wake-up', function(req, res) {
-  if (req.body.challenge) {
-    res.send(req.body.challenge) // need to resp to challenge on install
-  } else {
-    //wake up!
-    console.log('Im up!')
-    res.send(200)
-  }
-})
+app.post('/jira-service-desk', function(req, res) {
+  let issue = req.body.issue
+  let jiraURL = issue.self.split('/rest/api')[0]
 
-bot.team_join(function(obj) {
-  console.log("Team join triggered");
-  slack.chat.postMessage({
-    token: token,
-    channel: obj.user.id,
-    text: "Hello and welcome to Group Nine Slack!",
+
+  let postData = {
+    text: "An urgent issue has been reported!",
     attachments: [
       {
-        fallback: "Read the Group Nine Slack Guidelines",
-        color: "#000000",
-        title: "Group Nine Slack Guidelines",
-        title_link: "https://docs.google.com/a/thrillist.com/document/d/1zFI_vSrdYHMLVPSlhIpnbwRWnKTLFmXjIj-n9mbIKHc/edit?usp=sharing",
-        text: "Make sure to read our Slack Guidelines"
-      },
-      {
-        fallback: "Setup Your Slack Profile",
-        color: "#000000",
-        pretext: "Setup your profile",
-        title: "How To Guide",
-        title_link: "https://groupninemedia.slack.com/account/profile",
+        fallback: `${issue.fields.creator.name} created <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
+        color: "danger", // Can either be one of 'good', 'warning', 'danger', or any hex color code
+        title: `<${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
+        thumb_url: `${issue.fields.creator.avatarUrls["48x48"]}`,
         fields: [
           {
-              title: "Full Name",
-              value: "Let us know who you are!",
-              short: true
+            title: "Brand",
+            value: `${issue.fields.customfield_11305.value}`,
+            short: true
           },
           {
-              title: "Profile Picture",
-              value: "Show your face :)",
-              short: true
+            title: "Reporter",
+            value: `${issue.fields.creator.displayName}`,
+            short: true
           },
           {
-              title: "What You Do",
-              value: "werk werk werk werk werk",
-              short: false
-          }
-        ]
-      },
-      {
-        fallback: "Get familiar with Slack",
-        color: "#000000",
-        pretext: "Get familiar with Slack",
-        title: "Team Directory",
-        title_link: "https://groupninemedia.slack.com/team",
-        text: "Get the Who's Who in Group Nine",
-        fields: [
-          {
-              title: "Need Help?",
-              value: "Join #gn-slack-questions",
-              short: false
+            title: "Steps to Reproduce",
+            value: `${issue.fields.customfield_11202}`,
+            short: false
           }
         ]
       }
     ]
-  }, function(err, data) {
-      console.log('error')
-      console.log(err)
-      console.log(data)
-  });
-});
+  }
+  console.log(postData)
 
-bot.listen({token: token});
+  let url = `https://hooks.slack.com/services/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`
+
+  let options = {
+    method: 'post',
+    body: postData,
+    json: true,
+    url: url
+  }
+
+  request(options, function(err, res, body) {
+    if (err) {
+      console.error('error posting json: ', err)
+    } else {
+      console.log('alerted Slack')
+    }
+  })
+})
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
