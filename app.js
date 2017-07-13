@@ -15,16 +15,27 @@ app.use(bodyParser.json());
 
 // route for waking up the heroku app when a member joins
 app.post('/jira-service-desk', function(req, res) {
-  let issue = req.body.issue
-  let jiraURL = issue.self.split('/rest/api')[0]
+  let text,
+      color,
+      urgentField = 'customfield_11306',
+      issue = req.body.issue,
+      jiraURL = issue.self.split('/rest/api')[0];
 
+  // if the urgent field is "yes", text and color are different
+  if (issue.fields[urgentField] === "Yes") {
+    text = 'An urgent issue has been reported!'
+    color = 'danger'
+  } else {
+    text = 'An issue has been reported',
+    color = '#205081'
+  }
 
   let postData = {
-    text: "An urgent issue has been reported!",
+    text: text,
     attachments: [
       {
         fallback: `${issue.fields.creator.name} created <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
-        color: "danger", // Can either be one of 'good', 'warning', 'danger', or any hex color code
+        color: color, // Can either be one of 'good', 'warning', 'danger', or any hex color code
         title: `<${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
         thumb_url: `${issue.fields.creator.avatarUrls["48x48"]}`,
         fields: [
