@@ -22,7 +22,7 @@ app.post('/jira-service-desk', function(req, res) {
       jiraURL = issue.self.split('/rest/api')[0];
 
   // if the urgent field is "yes", text and color are different
-  if (issue.fields[urgentField] === "Yes") {
+  if (issue.fields[urgentField] && issue.fields[urgentField] === "Yes") {
     text = 'An urgent issue has been reported!'
     color = 'danger'
   } else {
