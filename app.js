@@ -20,13 +20,28 @@ app.post('/jira-service-desk', function(req, res) {
       issue = req.body.issue,
       jiraURL = issue.self.split('/rest/api')[0];
 
+  let requestType;
+  switch(issue.fields.issuetype.name) {
+    case 'Bug':
+      requestType = 'bug'
+      break;
+    case 'Story':
+      requestType = 'feature request'
+      break;
+    case 'Support Email':
+      requestType = 'support email'
+      break;
+    default:
+      requestType = 'issue'
+  }
+
   // if the urgent field is "yes", text and color are different
   console.log(issue.fields[urgentField])
   if (issue.fields[urgentField] && issue.fields[urgentField][0].value == "Yes") {
-    text = 'An urgent issue has been reported!'
+    text = `An urgent ${requestType} has been reported!`
     color = 'danger'
   } else {
-    text = 'An issue has been reported',
+    text = `A ${requestType} has been reported`,
     color = '#205081'
   }
 
