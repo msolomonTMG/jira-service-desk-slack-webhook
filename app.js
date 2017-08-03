@@ -13,7 +13,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-// route for waking up the heroku app when a member joins
 app.post('/jira-service-desk', function(req, res) {
   let text,
       color,
