@@ -63,15 +63,26 @@ app.post('/jira-service-desk', function(req, res) {
             title: "Reporter",
             value: `${issue.fields.creator.displayName}`,
             short: true
-          },
-          {
-            title: "Steps to Reproduce",
-            value: `${issue.fields.customfield_11202}`,
-            short: false
           }
         ]
       }
     ]
+  }
+  // if bug, show steps to repro. if feature (or anything else), show description
+  switch(requestType) {
+    case 'bug':
+      postData.attachments.fields.push({
+        title: "Steps to Reproduce",
+        value: `${issue.fields.customfield_11202}`,
+        short: false
+      })
+      break;
+    default:
+      postData.attachments.fields.push({
+        title: "Description",
+        value: `${issue.fields.description}`,
+        short: false
+      })
   }
   console.log(postData)
 
