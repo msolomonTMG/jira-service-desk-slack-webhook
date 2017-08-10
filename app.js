@@ -5,7 +5,11 @@ const
   bodyParser = require('body-parser'),
   slack = require('./slack'),
   slackChannels = {
-    techJiraServiceDesk: `https://hooks.slack.com/services/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`,
+    techJiraServiceDesk: process.env.TECH_JIRA_SERVICE_DESK_URL,
+    tlTechAndEdit: process.env.TL_TECH_AND_EDIT_URL,
+    ddTechAndEdit: process.env.DD_TECH_AND_EDIT_URL,
+    ntTechAndEdit: process.env.NT_TECH_AND_EDIT_URL,
+    skTechAndEdit: process.env.SK_TECH_AND_EDIT_URL
   },
   request = require('request');
 
@@ -83,6 +87,8 @@ app.post('/created', function(req, res) {
     color = '#205081'
   }
 
+  let brand = issue.fields.customfield_11305.value
+
   let attachments = [
     {
       fallback: `${issue.fields.creator.name} created <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
@@ -92,7 +98,7 @@ app.post('/created', function(req, res) {
       fields: [
         {
           title: "Brand",
-          value: `${issue.fields.customfield_11305.value}`,
+          value: brand,
           short: true
         },
         {
@@ -121,7 +127,27 @@ app.post('/created', function(req, res) {
       })
   }
 
-  slack.sendMessage([slackChannels.techJiraServiceDesk], text, attachments)
+  let urls = [slackChannels.techJiraServiceDesk]
+  // send the message to each respective edit slack channel based on brand
+  switch(brand) {
+    case 'Thrillist':
+    case 'Supercall':
+      urls.push(slackChannels.tlTechAndEdit)
+      break;
+    case 'The Dodo':
+      urls.push(slackChannels.ddTechAndEdit)
+      break;
+    case 'NowThis':
+      urls.push(slackChannels.ntTechAndEdit)
+      break;
+    case 'Seeker':
+      urls.push(slackChannels.skTechAndEdit)
+      break;
+    default:
+      // do nothing, I don't recognize this brand
+  }
+
+  slack.sendMessage(urls, text, attachments)
 })
 
 app.listen(app.get('port'), function() {
