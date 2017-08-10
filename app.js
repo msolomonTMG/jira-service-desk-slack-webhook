@@ -3,6 +3,10 @@
 const
   express = require('express'),
   bodyParser = require('body-parser'),
+  slack = require('./slack'),
+  slackChannels = {
+    techJiraServiceDesk: `https://hooks.slack.com/services/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`,
+  },
   request = require('request');
 
 var app = express();
@@ -13,7 +17,42 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-app.post('/jira-service-desk', function(req, res) {
+app.post('/comment', function(req, res) {
+  let comment = req.body.comment,
+      issue = req.body.issue,
+      jiraURL = issue.self.split('/rest/api')[0];
+
+  console.log(req.body)
+
+  let text = `${comment.author.displayName} commented on an issue`
+  let attachments = [
+    {
+      fallback: `${comment.author.displayName} commented on <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
+      title: `<${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
+      thumb_url: `${comment.author.avatarUrls["48x48"]}`,
+      fields: [
+        {
+          title: "Brand",
+          value: `${issue.fields.customfield_11305.value}`,
+          short: true
+        },
+        {
+          title: "Reporter",
+          value: `${issue.fields.creator.displayName}`,
+          short: true
+        },
+        {
+          title: "Comment",
+          value: `${comment.body}`,
+          short: false
+        }
+      ]
+    }
+  ]
+  slack.sendMessage([slackChannels.techJiraServiceDesk], text, attachments)
+})
+
+app.post('/created', function(req, res) {
   let text,
       color,
       urgentField = 'customfield_11306',
@@ -36,7 +75,6 @@ app.post('/jira-service-desk', function(req, res) {
   }
 
   // if the urgent field is "yes", text and color are different
-  console.log(issue.fields[urgentField])
   if (issue.fields[urgentField] && issue.fields[urgentField][0].value == "Yes") {
     text = `An urgent ${requestType} has been reported!`
     color = 'danger'
@@ -45,63 +83,45 @@ app.post('/jira-service-desk', function(req, res) {
     color = '#205081'
   }
 
-  let postData = {
-    text: text,
-    attachments: [
-      {
-        fallback: `${issue.fields.creator.name} created <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
-        color: color, // Can either be one of 'good', 'warning', 'danger', or any hex color code
-        title: `<${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
-        thumb_url: `${issue.fields.creator.avatarUrls["48x48"]}`,
-        fields: [
-          {
-            title: "Brand",
-            value: `${issue.fields.customfield_11305.value}`,
-            short: true
-          },
-          {
-            title: "Reporter",
-            value: `${issue.fields.creator.displayName}`,
-            short: true
-          }
-        ]
-      }
-    ]
-  }
+  let attachments = [
+    {
+      fallback: `${issue.fields.creator.name} created <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
+      color: color, // Can either be one of 'good', 'warning', 'danger', or any hex color code
+      title: `<${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
+      thumb_url: `${issue.fields.creator.avatarUrls["48x48"]}`,
+      fields: [
+        {
+          title: "Brand",
+          value: `${issue.fields.customfield_11305.value}`,
+          short: true
+        },
+        {
+          title: "Reporter",
+          value: `${issue.fields.creator.displayName}`,
+          short: true
+        }
+      ]
+    }
+  ]
+
   // if bug, show steps to repro. if feature (or anything else), show description
   switch(requestType) {
     case 'bug':
-      postData.attachments[0].fields.push({
+      attachments[0].fields.push({
         title: "Steps to Reproduce",
         value: `${issue.fields.customfield_11202}`,
         short: false
       })
       break;
     default:
-      postData.attachments[0].fields.push({
+      attachments[0].fields.push({
         title: "Description",
         value: `${issue.fields.description}`,
         short: false
       })
   }
-  console.log(postData)
 
-  let url = `https://hooks.slack.com/services/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`
-
-  let options = {
-    method: 'post',
-    body: postData,
-    json: true,
-    url: url
-  }
-
-  request(options, function(err, res, body) {
-    if (err) {
-      console.error('error posting json: ', err)
-    } else {
-      console.log('alerted Slack')
-    }
-  })
+  slack.sendMessage([slackChannels.techJiraServiceDesk], text, attachments)
 })
 
 app.listen(app.get('port'), function() {
