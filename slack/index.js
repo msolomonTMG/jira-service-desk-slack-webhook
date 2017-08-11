@@ -12,8 +12,6 @@ var functions = {
    * @param {array} attachments - Array of objects for slack attachments
   */
   sendMessage: function(urls, text, attachments) {
-    console.log('URLS RECEIVED')
-    console.log(urls)
     return new Promise(function(resolve, reject) {
 
       let postData = {
@@ -23,7 +21,7 @@ var functions = {
 
       urls.forEach((url, index) => {
         let isFinalUrl = urls.length == index + 1
-        console.log(url)
+
         let options = {
           method: 'post',
           body: postData,

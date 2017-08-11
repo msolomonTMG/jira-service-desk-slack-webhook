@@ -146,8 +146,6 @@ app.post('/created', function(req, res) {
     default:
       // do nothing, I don't recognize this brand
   }
-  console.log('URLS BEING SENT')
-  console.log(urls)
   slack.sendMessage(urls, text, attachments)
 })
 
