@@ -21,7 +21,7 @@ var functions = {
 
       urls.forEach((url, index) => {
         let isFinalUrl = urls.length == index + 1
-
+        console.log(url)
         let options = {
           method: 'post',
           body: postData,
