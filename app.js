@@ -143,6 +143,9 @@ app.post('/created', function(req, res) {
     case 'Seeker':
       urls.push(slackChannels.skTechAndEdit)
       break;
+    case 'NowThis':
+      urls.push(slackChannels.ntTechAndEdit)
+      break;
     default:
       // do nothing, I don't recognize this brand
   }
