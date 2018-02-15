@@ -139,10 +139,7 @@ app.post('/created', function(req, res) {
 
   let urls = [slackChannels.techJiraServiceDesk]
   // send the message to each respective edit slack channel based on brand
-  if (brandValues.indexOf('Thrillist') > -1) {
-    urls.push(slackChannels.tlTechAndEdit)
-  }
-  if (brandValues.indexOf('Supercall') > -1) {
+  if (brandValues.indexOf('Thrillist') > -1 || brandValues.indexOf('Supercall') > -1) {
     urls.push(slackChannels.tlTechAndEdit)
   }
   if (brandValues.indexOf('The Dodo') > -1) {
