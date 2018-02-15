@@ -93,7 +93,11 @@ app.post('/created', function(req, res) {
     color = '#205081'
   }
 
-  let brand = issue.fields.customfield_11305.value
+  let brands = issue.fields.customfield_11954
+  let brandValues = []
+  brands.forEach(brand => {
+    brandValues.push(brand.value)
+  })
 
   let attachments = [
     {
@@ -103,8 +107,8 @@ app.post('/created', function(req, res) {
       thumb_url: `${issue.fields.creator.avatarUrls["48x48"]}`,
       fields: [
         {
-          title: "Brand",
-          value: brand,
+          title: "Brands",
+          value: `${brandValues.toString()}`,
           short: true
         },
         {
