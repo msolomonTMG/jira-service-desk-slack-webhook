@@ -139,25 +139,20 @@ app.post('/created', function(req, res) {
 
   let urls = [slackChannels.techJiraServiceDesk]
   // send the message to each respective edit slack channel based on brand
-  switch(brand) {
-    case 'Thrillist':
-    case 'Supercall':
-      urls.push(slackChannels.tlTechAndEdit)
-      break;
-    case 'The Dodo':
-      urls.push(slackChannels.ddTechAndEdit)
-      break;
-    case 'NowThis':
-      urls.push(slackChannels.ntTechAndEdit)
-      break;
-    case 'Seeker':
-      urls.push(slackChannels.skTechAndEdit)
-      break;
-    case 'NowThis':
-      urls.push(slackChannels.ntTechAndEdit)
-      break;
-    default:
-      // do nothing, I don't recognize this brand
+  if (brandValues.indexOf('Thrillist') > -1) {
+    urls.push(slackChannels.tlTechAndEdit)
+  }
+  if (brandValues.indexOf('Supercall') > -1) {
+    urls.push(slackChannels.tlTechAndEdit)
+  }
+  if (brandValues.indexOf('The Dodo') > -1) {
+    urls.push(slackChannels.ddTechAndEdit)
+  }
+  if (brandValues.indexOf('NowThis') > -1) {
+    urls.push(slackChannels.ntTechAndEdit)
+  }
+  if (brandValues.indexOf('Seeker') > -1) {
+    urls.push(slackChannels.skTechAndEdit)
   }
   slack.sendMessage(urls, text, attachments)
 })
