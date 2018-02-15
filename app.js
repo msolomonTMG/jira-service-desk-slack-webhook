@@ -28,6 +28,12 @@ app.post('/comment', function(req, res) {
 
   console.log(req.body)
 
+  let brands = issue.fields.customfield_11954
+  let brandValues = []
+  brands.forEach(brand => {
+    brandValues.push(brand.value)
+  })
+
   let text = `${comment.author.displayName} commented on an issue`
   let attachments = [
     {
@@ -36,8 +42,8 @@ app.post('/comment', function(req, res) {
       thumb_url: `${comment.author.avatarUrls["48x48"]}`,
       fields: [
         {
-          title: "Brand",
-          value: `${issue.fields.customfield_11305.value}`,
+          title: "Brands",
+          value: `${brandValues.toString()}`,
           short: true
         },
         {
