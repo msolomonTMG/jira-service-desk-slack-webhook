@@ -9,7 +9,9 @@ const
     tlTechAndEdit: process.env.TL_TECH_AND_EDIT_URL,
     ddTechAndEdit: process.env.DD_TECH_AND_EDIT_URL,
     ntTechAndEdit: process.env.NT_TECH_AND_EDIT_URL,
-    skTechAndEdit: process.env.SK_TECH_AND_EDIT_URL
+    skTechAndEdit: process.env.SK_TECH_AND_EDIT_URL,
+    g9TechAndInsights: process.env.G9_TECH_AND_INSIGHTS_URL,
+    g9TechAndRevOps:   process.env.G9_TECH_AND_REVOPS_URL
   },
   request = require('request');
 
@@ -104,6 +106,9 @@ app.post('/created', function(req, res) {
     brandValues.push(brand.value)
   })
 
+  // stakeholder group field is called "team" on the front end
+  let team = issue.fields.customfield_11959.value
+
   let attachments = [
     {
       fallback: `${issue.fields.creator.name} created <${jiraURL}/browse/${issue.key}|${issue.key}: ${issue.fields.summary}>`,
@@ -123,7 +128,7 @@ app.post('/created', function(req, res) {
         },
         {
           title: "Team",
-          value: `${issue.fields.customfield_11959.value}`,
+          value: `${team}`,
           short: true
         }
       ]
@@ -149,6 +154,7 @@ app.post('/created', function(req, res) {
 
   let urls = [slackChannels.techJiraServiceDesk]
   // send the message to each respective edit slack channel based on brand
+  // brand is multi-select, so do an if statement to check for each one
   if (brandValues.indexOf('Thrillist') > -1 || brandValues.indexOf('Supercall') > -1) {
     urls.push(slackChannels.tlTechAndEdit)
   }
@@ -161,6 +167,13 @@ app.post('/created', function(req, res) {
   if (brandValues.indexOf('Seeker') > -1) {
     urls.push(slackChannels.skTechAndEdit)
   }
+  // team is single select. use else statements
+  if (team == 'Insights') {
+    urls.push(slackChannels.g9TechAndInsights)
+  } else if (team == 'RevOps') {
+    urls.push(slackChannels.g9TechAndRevOps)
+  }
+
   slack.sendMessage(urls, text, attachments)
 })
 
