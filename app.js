@@ -52,6 +52,11 @@ app.post('/comment', function(req, res) {
           short: true
         },
         {
+          title: "Team",
+          value: `${issue.fields.customfield_11959.value}`,
+          short: true
+        },
+        {
           title: "Comment",
           value: `${comment.body}`,
           short: false
@@ -114,6 +119,11 @@ app.post('/created', function(req, res) {
         {
           title: "Reporter",
           value: `${issue.fields.creator.displayName}`,
+          short: true
+        },
+        {
+          title: "Team",
+          value: `${issue.fields.customfield_11959.value}`,
           short: true
         }
       ]
