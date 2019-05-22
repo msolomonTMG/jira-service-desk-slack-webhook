@@ -153,26 +153,30 @@ app.post('/created', function(req, res) {
   }
 
   let urls = [slackChannels.techJiraServiceDesk]
+  // This app started sending an exessive amt of messages to channels
+  // we decided to only send to the tech channel for now until this app is retired
+  // see https://groupninemedia.slack.com/archives/C3RD8BKUP/p1558475524015100
+  //
   // send the message to each respective edit slack channel based on brand
   // brand is multi-select, so do an if statement to check for each one
-  if (brandValues.indexOf('Thrillist') > -1 || brandValues.indexOf('Supercall') > -1) {
-    urls.push(slackChannels.tlTechAndEdit)
-  }
-  if (brandValues.indexOf('The Dodo') > -1) {
-    urls.push(slackChannels.ddTechAndEdit)
-  }
-  if (brandValues.indexOf('NowThis') > -1) {
-    urls.push(slackChannels.ntTechAndEdit)
-  }
-  if (brandValues.indexOf('Seeker') > -1) {
-    urls.push(slackChannels.skTechAndEdit)
-  }
-  // team is single select. use else statements
-  if (team == 'Insights') {
-    urls.push(slackChannels.g9TechAndInsights)
-  } else if (team == 'RevOps') {
-    urls.push(slackChannels.g9TechAndRevOps)
-  }
+  // if (brandValues.indexOf('Thrillist') > -1 || brandValues.indexOf('Supercall') > -1) {
+  //   urls.push(slackChannels.tlTechAndEdit)
+  // }
+  // if (brandValues.indexOf('The Dodo') > -1) {
+  //   urls.push(slackChannels.ddTechAndEdit)
+  // }
+  // if (brandValues.indexOf('NowThis') > -1) {
+  //   urls.push(slackChannels.ntTechAndEdit)
+  // }
+  // if (brandValues.indexOf('Seeker') > -1) {
+  //   urls.push(slackChannels.skTechAndEdit)
+  // }
+  // // team is single select. use else statements
+  // if (team == 'Insights') {
+  //   urls.push(slackChannels.g9TechAndInsights)
+  // } else if (team == 'RevOps') {
+  //   urls.push(slackChannels.g9TechAndRevOps)
+  // }
 
   slack.sendMessage(urls, text, attachments)
 })
